@@ -6,6 +6,7 @@
 <title>IBMer WatsonX Challenge Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="submissions-data.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'IBM Plex Sans',sans-serif;background:#161616;color:#f4f4f4;min-height:100vh}
@@ -184,7 +185,6 @@ tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
 
 </main>
 <footer class="footer">IBM Infrastructure &middot; WatsonX Challenge 2026 &middot; 996 Submissions</footer>
-<script src="submissions-data.js"></script>
 <script>
 const SOL_COLORS={'Security, Compliance & Risk Automation':'#da1e28','AI-Powered Developer & Engineering Productivity':'#0f62fe','Data, Reporting & Decision Intelligence':'#8a3ffc','Operations, Automation & Self-Healing Workflows':'#009d9a','Knowledge Management & Documentation AI':'#ff832b','Uncategorised':'#6f6f6f'};
 const TECH_COLORS={'IBM Bob Agentic / Mode-Based':'#0f62fe','ML / AI / RAG Pipelines':'#8a3ffc','Java / Spring Boot Applications':'#da1e28','Python / Flask / CLI Tools':'#ff832b','TypeScript / Node.js':'#42be65','Low-Level / Systems / Infra Tooling':'#009d9a','Uncategorised':'#6f6f6f'};
@@ -266,7 +266,7 @@ function renderTable(){
 function changePage(dir){const pages=Math.ceil(filteredSubs.length/PAGE_SIZE)||1;currentPage=Math.max(1,Math.min(pages,currentPage+dir));renderTable();}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('load',()=>{
   if(window.SUBMISSIONS_DATA && window.SUBMISSIONS_DATA.length){
     SUB_DATA=window.SUBMISSIONS_DATA;
     filteredSubs=[...SUB_DATA];
