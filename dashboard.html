@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IBMer WatsonX Challenge Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:#161616;color:#f4f4f4;min-height:100vh}
+.header{background:#0f62fe;border-bottom:3px solid #0043ce}
+.header-inner{max-width:1400px;margin:0 auto;padding:20px 32px;display:flex;align-items:center;gap:24px}
+.ibm-logo{font-size:28px;font-weight:700;letter-spacing:4px;color:#fff;border-right:2px solid rgba(255,255,255,.4);padding-right:24px}
+.header-text h1{font-size:22px;font-weight:600;color:#fff}
+.header-text .subtitle{font-size:13px;color:rgba(255,255,255,.8);margin-top:4px}
+.info-bar{background:#0043ce;padding:10px 32px}
+.info-bar-inner{max-width:1400px;margin:0 auto;display:flex;gap:16px;flex-wrap:wrap}
+.info-pill{background:rgba(255,255,255,.1);border-radius:20px;padding:4px 14px;font-size:12px;color:rgba(255,255,255,.9)}
+.info-pill span{font-weight:600;color:#fff}
+.toggle-bar{background:#1e1e1e;border-bottom:1px solid #353535;padding:20px 32px;display:flex;justify-content:center}
+.toggle-btn{padding:12px 32px;font-size:15px;font-weight:600;border:2px solid #393939;background:#393939;color:#a8a8a8;cursor:pointer;font-family:inherit;transition:.2s}
+.toggle-btn:first-child{border-radius:4px 0 0 4px}
+.toggle-btn:last-child{border-radius:0 4px 4px 0}
+.toggle-btn.active{background:#0f62fe;border-color:#0f62fe;color:#fff}
+.main{max-width:1400px;margin:0 auto;padding:32px 32px 48px}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:16px}
+.kpi-card{background:#262626;border-radius:4px;padding:24px 28px;border-top:4px solid transparent}
+.kpi-card.blue{border-top-color:#0f62fe}
+.kpi-card.green{border-top-color:#198038}
+.kpi-card.purple{border-top-color:#6929c4}
+.kpi-card.teal{border-top-color:#009d9a}
+.kpi-label{font-size:13px;font-weight:500;color:#a8a8a8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.kpi-value{font-size:48px;font-weight:700;line-height:1}
+.kpi-card.blue .kpi-value{color:#4589ff}
+.kpi-card.green .kpi-value{color:#42be65}
+.kpi-card.purple .kpi-value{color:#a56eff}
+.kpi-card.teal .kpi-value{color:#3ddbd9}
+.sub-kpi-row{display:flex;justify-content:center;margin-bottom:36px}
+.sub-kpi-card{background:#262626;border-radius:4px;padding:14px 36px;border-left:4px solid #f1c21b;display:flex;align-items:center;gap:14px}
+.sub-kpi-pct{font-size:32px;font-weight:700;color:#f1c21b}
+.sub-kpi-desc{font-size:14px;color:#c6c6c6}
+.chart-section{background:#262626;border-radius:4px;padding:28px 28px 20px;margin-bottom:28px}
+.chart-heading{font-size:17px;font-weight:600;color:#f4f4f4;margin-bottom:4px}
+.chart-sub{font-size:12px;color:#6f6f6f;margin-bottom:16px}
+.chart-div{width:100%;height:420px}
+.table-section{background:#262626;border-radius:4px;padding:28px;margin-bottom:28px;overflow-x:auto}
+.table-heading{font-size:17px;font-weight:600;color:#f4f4f4;margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead tr{background:#353535}
+thead th{padding:12px 16px;text-align:left;font-weight:600;color:#a8a8a8;font-size:12px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid #3d3d3d}
+thead th.num{text-align:right}
+tbody tr{border-bottom:1px solid #353535;transition:background .15s}
+tbody tr:hover{background:#2e2e2e}
+tbody td{padding:11px 16px;color:#e0e0e0;vertical-align:middle}
+tbody td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.td-blue{color:#4589ff}.td-green{color:#42be65}.td-purple{color:#a56eff}
+tfoot tr{background:#1e1e1e;border-top:2px solid #3d3d3d}
+tfoot td{padding:12px 16px;font-weight:700;color:#f4f4f4}
+tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:2px 8px;border-radius:2px;font-size:11px;font-weight:600;margin-left:6px}
+.badge-blue{background:rgba(15,98,254,.2);color:#4589ff}
+.badge-green{background:rgba(25,128,56,.2);color:#42be65}
+.badge-purple{background:rgba(105,41,196,.2);color:#a56eff}
+.filter-bar{background:#262626;border-radius:4px;padding:20px 24px;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.filter-bar label{font-size:12px;color:#a8a8a8;display:flex;flex-direction:column;gap:4px;flex:1;min-width:160px}
+.filter-bar select,.search-box{background:#3d3d3d;border:1px solid #525252;color:#f4f4f4;padding:8px 12px;border-radius:3px;font-size:13px;font-family:inherit;width:100%}
+.filter-bar select:focus,.search-box:focus{outline:1px solid #4589ff}
+.search-wrap{flex:2;min-width:200px}
+.pagination{display:flex;align-items:center;gap:12px;padding:16px 0 4px;justify-content:flex-end}
+.page-btn{background:#393939;border:1px solid #525252;color:#f4f4f4;padding:7px 16px;border-radius:3px;cursor:pointer;font-size:13px;font-family:inherit}
+.page-btn:disabled{opacity:.4;cursor:default}
+.page-info{font-size:13px;color:#a8a8a8}
+.sb-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap}
+.footer{background:#0f0f0f;border-top:1px solid #353535;padding:18px 32px;text-align:center;color:#6f6f6f;font-size:13px}
+@media(max-width:900px){.kpi-row{grid-template-columns:1fr}.header-inner{flex-direction:column;align-items:flex-start}.ibm-logo{border-right:none;padding-right:0}.main{padding:20px 16px 40px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div class="ibm-logo">IBM</div>
+    <div class="header-text">
+      <h1>IBMer WatsonX Challenge Dashboard &mdash; Infrastructure</h1>
+      <div class="subtitle">Infrastructure Division &middot; Jul 2026 &middot; Data as of Jul 22</div>
+    </div>
+  </div>
+</header>
+<div class="info-bar">
+  <div class="info-bar-inner">
+    <div class="info-pill">Org: <span>Infrastructure</span></div>
+    <div class="info-pill">Exec Leader: <span>Ric Lewis</span></div>
+    <div class="info-pill">Org Leaders: <span>Jamie Thomas &bull; Barry Baker &bull; Alan Peacock &bull; Koos Lodewijkx</span></div>
+    <div class="info-pill">Global Managers: <span>Multiple Teams</span></div>
+  </div>
+</div>
+<div class="toggle-bar">
+  <button class="toggle-btn active" onclick="switchView('reg')">&#128203; Registrations</button>
+  <button class="toggle-btn" onclick="switchView('sub')">&#128640; Project Submissions</button>
+</div>
+<main class="main">
+  <div id="view-reg">
+    <div class="kpi-row">
+      <div class="kpi-card blue"><div class="kpi-label">Registered for Challenge</div><div class="kpi-value">13,345</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Joined a Team</div><div class="kpi-value">10,637</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Team Leaders / Teams Created</div><div class="kpi-value">2,548</div></div>
+    </div>
+    <div class="sub-kpi-row">
+      <div class="sub-kpi-card"><div class="sub-kpi-pct">79.7%</div><div class="sub-kpi-desc">of registrants joined a team</div></div>
+    </div>
+    <div class="chart-section"><div class="chart-heading">Registered for IBMer WatsonX Challenge</div><div class="chart-sub">By Org L2 | Total: 13,345</div><div class="chart-div" id="chart1"></div></div>
+    <div class="chart-section"><div class="chart-heading">Joined a WatsonX Challenge Team</div><div class="chart-sub">By Org L2 | Total: 10,637</div><div class="chart-div" id="chart2"></div></div>
+    <div class="chart-section"><div class="chart-heading">Team Leaders / Teams Created</div><div class="chart-sub">By Org L2 | Total: 2,548</div><div class="chart-div" id="chart3"></div></div>
+    <div class="table-section">
+      <div class="table-heading">Summary by Org L2</div>
+      <table>
+        <thead><tr><th>Org L2</th><th class="num">Registered</th><th class="num">Joined Team</th><th class="num">Team Leaders</th></tr></thead>
+        <tbody id="regTableBody"></tbody>
+        <tfoot><tr><td><strong>Total</strong></td><td class="num td-blue">13,345</td><td class="num td-green">10,637 <span class="badge badge-green">79.7%</span></td><td class="num td-purple">2,548</td></tr></tfoot>
+      </table>
+    </div>
+  </div>
+  <div id="view-sub" style="display:none">
+    <div class="kpi-row" id="subKpiRow"></div>
+    <div class="filter-bar">
+      <label class="search-wrap">Search
+        <input class="search-box" type="text" id="searchBox" placeholder="Search team, org, manager..." oninput="applyFilters()">
+      </label>
+      <label>Org
+        <select id="filterOrg" onchange="applyFilters()"><option value="">All Orgs</option></select>
+      </label>
+      <label>Exec Leader
+        <select id="filterExec" onchange="applyFilters()"><option value="">All Exec Leaders</option></select>
+      </label>
+      <label>Solution Bucket
+        <select id="filterSol" onchange="applyFilters()"><option value="">All Solution Buckets</option></select>
+      </label>
+      <label>Technical Bucket
+        <select id="filterTech" onchange="applyFilters()"><option value="">All Technical Buckets</option></select>
+      </label>
+    </div>
+    <div class="table-section">
+      <div class="table-heading">Project Submissions <span id="subCount" style="font-size:13px;color:#6f6f6f;font-weight:400"></span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Team Name</th>
+            <th>Org</th>
+            <th>Business Unit</th>
+            <th>Exec Leader</th>
+            <th>Org Leader Direct</th>
+            <th>Global Manager</th>
+            <th>Solution Bucket</th>
+            <th>Technical Bucket</th>
+            <th>Impact Buckets</th>
+          </tr>
+        </thead>
+        <tbody id="subTableBody"></tbody>
+      </table>
+      <div class="pagination">
+        <button class="page-btn" id="prevBtn" onclick="changePage(-1)">&#8592; Prev</button>
+        <span class="page-info" id="pageInfo"></span>
+        <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next &#8594;</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="footer">IBM Infrastructure &middot; WatsonX Challenge 2026</footer>
+<script>
+// ââ Registration data ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const REG_DATA = [
+  { org: 'IBM Z',               registered: 3021, joined: 2487, leaders: 601 },
+  { org: 'Cloud',               registered: 2654, joined: 2134, leaders: 512 },
+  { org: 'Storage',             registered: 1876, joined: 1502, leaders: 358 },
+  { org: 'Power',               registered: 1543, joined: 1211, leaders: 287 },
+  { org: 'CISO',                registered: 1102, joined:  876, leaders: 208 },
+  { org: 'Platform',            registered:  987, joined:  789, leaders: 189 },
+  { org: 'COO',                 registered:  743, joined:  589, leaders: 143 },
+  { org: 'TLS',                 registered:  621, joined:  489, leaders: 118 },
+  { org: 'Enterprise Dev',      registered:  498, joined:  389, leaders:  94 },
+  { org: 'Growth & Innovation', registered:  300, joined:  171, leaders:  38 }
+];
+
+// ââ Submission data âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const SUB_DATA = [
+  { team:'Assure AI', org:'CISO', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Barry Baker', gm:'Team Alpha', sol:'Security, Compliance & Risk Automation', tech:'IBM Bob Agentic / Mode-Based', impact:'Efficiency & Time Savings; Risk Reduction & Compliance' },
+  { team:'CloudOps Wizard', org:'Cloud', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Jamie Thomas', gm:'Team Beta', sol:'Operations, Automation & Self-Healing Workflows', tech:'ML / AI / RAG Pipelines', impact:'Efficiency & Time Savings; Accuracy & Consistency' },
+  { team:'Z Sentinel', org:'IBM Z', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Alan Peacock', gm:'Team Gamma', sol:'AI-Powered Developer & Engineering Productivity', tech:'IBM Bob Agentic / Mode-Based', impact:'Speed Up Product Development; Innovation & New Features' },
+  { team:'StoreSmart', org:'Storage', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Koos Lodewijkx', gm:'Team Delta', sol:'Data, Reporting & Decision Intelligence', tech:'Python / Flask / CLI Tools', impact:'Faster Information Access; Accuracy & Consistency' },
+  { team:'PowerAI', org:'Power', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Jamie Thomas', gm:'Team Epsilon', sol:'AI-Powered Developer & Engineering Productivity', tech:'Java / Spring Boot Applications', impact:'Efficiency & Time Savings; Code Quality & Maintenance' },
+  { team:'DocuBot', org:'Platform', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Barry Baker', gm:'Team Zeta', sol:'Knowledge Management & Documentation AI', tech:'TypeScript / Node.js', impact:'Faster Information Access; Simplified Team Processes' },
+  { team:'SecureFlow', org:'CISO', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Barry Baker', gm:'Team Eta', sol:'Security, Compliance & Risk Automation', tech:'Python / Flask / CLI Tools', impact:'Risk Reduction & Compliance; Accuracy & Consistency' },
+  { team:'TLSAutomate', org:'TLS', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Alan Peacock', gm:'Team Theta', sol:'Operations, Automation & Self-Healing Workflows', tech:'Low-Level / Systems / Infra Tooling', impact:'Efficiency & Time Savings; Simplified Team Processes' },
+  { team:'EnterpriseMind', org:'Enterprise Dev', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Koos Lodewijkx', gm:'Team Iota', sol:'AI-Powered Developer & Engineering Productivity', tech:'ML / AI / RAG Pipelines', impact:'Speed Up Product Development; Innovation & New Features' },
+  { team:'GrowthHack AI', org:'Growth & Innovation', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Jamie Thomas', gm:'Team Kappa', sol:'Data, Reporting & Decision Intelligence', tech:'IBM Bob Agentic / Mode-Based', impact:'Faster Information Access; Efficiency & Time Savings' }
+];
+
+// ââ Badge colours âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const SOL_COLORS = {
+  'Security, Compliance & Risk Automation':          '#da1e28',
+  'AI-Powered Developer & Engineering Productivity': '#0f62fe',
+  'Data, Reporting & Decision Intelligence':         '#8a3ffc',
+  'Operations, Automation & Self-Healing Workflows': '#009d9a',
+  'Knowledge Management & Documentation AI':         '#ff832b',
+  'Uncategorised':                                   '#6f6f6f'
+};
+const TECH_COLORS = {
+  'IBM Bob Agentic / Mode-Based':      '#0f62fe',
+  'ML / AI / RAG Pipelines':           '#8a3ffc',
+  'Java / Spring Boot Applications':   '#da1e28',
+  'Python / Flask / CLI Tools':        '#ff832b',
+  'TypeScript / Node.js':              '#42be65',
+  'Low-Level / Systems / Infra Tooling':'#009d9a',
+  'Uncategorised':                     '#6f6f6f'
+};
+
+// ââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+let filteredSubs = [...SUB_DATA];
+let currentPage  = 1;
+const PAGE_SIZE  = 25;
+
+// ââ View Toggle âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function switchView(view) {
+  document.getElementById('view-reg').style.display = view === 'reg' ? '' : 'none';
+  document.getElementById('view-sub').style.display = view === 'sub' ? '' : 'none';
+  document.querySelectorAll('.toggle-btn').forEach((b, i) => {
+    b.classList.toggle('active', (view === 'reg' && i === 0) || (view === 'sub' && i === 1));
+  });
+  if (view === 'sub') renderSubView();
+}
+
+// ââ Registration Charts âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function initRegCharts() {
+  const orgs  = REG_DATA.map(r => r.org);
+  const makeChart = (id, key, color, label) => {
+    const c = echarts.init(document.getElementById(id));
+    c.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      grid: { left: 160, right: 60, top: 20, bottom: 40 },
+      xAxis: { type: 'value', axisLabel: { color: '#a8a8a8' }, splitLine: { lineStyle: { color: '#353535' } } },
+      yAxis: { type: 'category', data: orgs.slice().reverse(), axisLabel: { color: '#c6c6c6', fontSize: 13 }, axisLine: { lineStyle: { color: '#525252' } } },
+      series: [{ type: 'bar', data: REG_DATA.map(r => r[key]).reverse(), itemStyle: { color }, barMaxWidth: 36,
+        label: { show: true, position: 'right', color: '#f4f4f4', fontSize: 12, formatter: v => v.data.toLocaleString() } }]
+    });
+    window.addEventListener('resize', () => c.resize());
+  };
+  makeChart('chart1', 'registered', '#4589ff', 'Registered');
+  makeChart('chart2', 'joined',     '#42be65', 'Joined Team');
+  makeChart('chart3', 'leaders',    '#a56eff', 'Team Leaders');
+
+  // Registration table
+  const tbody = document.getElementById('regTableBody');
+  tbody.innerHTML = REG_DATA.map(r => `
+    <tr>
+      <td>${r.org}</td>
+      <td class="num td-blue">${r.registered.toLocaleString()}</td>
+      <td class="num td-green">${r.joined.toLocaleString()} <span class="badge badge-green">${Math.round(r.joined/r.registered*100)}%</span></td>
+      <td class="num td-purple">${r.leaders.toLocaleString()}</td>
+    </tr>`).join('');
+}
+
+// ââ Submissions View ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderSubView() {
+  // KPIs
+  const solSet  = new Set(SUB_DATA.map(r => r.sol));
+  const techSet = new Set(SUB_DATA.map(r => r.tech));
+  document.getElementById('subKpiRow').innerHTML = `
+    <div class="kpi-card blue"><div class="kpi-label">Total Submissions</div><div class="kpi-value">${SUB_DATA.length}</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Solution Buckets</div><div class="kpi-value">${solSet.size}</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Technical Buckets</div><div class="kpi-value">${techSet.size}</div></div>`;
+
+  // Populate filter dropdowns
+  populateSelect('filterOrg',  [...new Set(SUB_DATA.map(r => r.org))].sort());
+  populateSelect('filterExec', [...new Set(SUB_DATA.map(r => r.exec))].sort());
+  populateSelect('filterSol',  [...new Set(SUB_DATA.map(r => r.sol))].sort());
+  populateSelect('filterTech', [...new Set(SUB_DATA.map(r => r.tech))].sort());
+
+  applyFilters();
+}
+
+function populateSelect(id, values) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  // keep first "All" option, rebuild rest
+  while (sel.options.length > 1) sel.remove(1);
+  values.forEach(v => { const o = document.createElement('option'); o.value = o.textContent = v; sel.appendChild(o); });
+  sel.value = cur;
+}
+
+function applyFilters() {
+  const q    = (document.getElementById('searchBox').value || '').toLowerCase();
+  const org  = document.getElementById('filterOrg').value;
+  const exec = document.getElementById('filterExec').value;
+  const sol  = document.getElementById('filterSol').value;
+  const tech = document.getElementById('filterTech').value;
+
+  filteredSubs = SUB_DATA.filter(r => {
+    if (org  && r.org  !== org)  return false;
+    if (exec && r.exec !== exec) return false;
+    if (sol  && r.sol  !== sol)  return false;
+    if (tech && r.tech !== tech) return false;
+    if (q) {
+      const hay = [r.team, r.org, r.gm, r.sol, r.tech, r.impact].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const total = filteredSubs.length;
+  const pages = Math.ceil(total / PAGE_SIZE) || 1;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page  = filteredSubs.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('subCount').textContent = `(${total.toLocaleString()} results)`;
+  document.getElementById('pageInfo').textContent  = `Page ${currentPage} of ${pages}`;
+  document.getElementById('prevBtn').disabled      = currentPage === 1;
+  document.getElementById('nextBtn').disabled      = currentPage === pages;
+
+  const tbody = document.getElementById('subTableBody');
+  tbody.innerHTML = page.map(r => {
+    const sc = SOL_COLORS[r.sol]  || '#6f6f6f';
+    const tc = TECH_COLORS[r.tech] || '#6f6f6f';
+    const impacts = (r.impact || '').split(';').map(s => s.trim()).filter(Boolean)
+      .map(s => `<span class="sb-badge" style="background:rgba(61,219,217,.15);color:#3ddbd9">${esc(s)}</span>`).join(' ');
+    return `<tr>
+      <td><strong>${esc(r.team)}</strong></td>
+      <td>${esc(r.org)}</td>
+      <td>${esc(r.bu)}</td>
+      <td>${esc(r.exec)}</td>
+      <td>${esc(r.orgLeader)}</td>
+      <td>${esc(r.gm)}</td>
+      <td><span class="sb-badge" style="background:${sc}22;color:${sc}">${esc(r.sol)}</span></td>
+      <td><span class="sb-badge" style="background:${tc}22;color:${tc}">${esc(r.tech)}</span></td>
+      <td>${impacts}</td>
+    </tr>`;
+  }).join('');
+}
+
+function changePage(dir) {
+  const pages = Math.ceil(filteredSubs.length / PAGE_SIZE) || 1;
+  currentPage = Math.max(1, Math.min(pages, currentPage + dir));
+  renderTable();
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ââ Boot ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+window.addEventListener('DOMContentLoaded', () => {
+  initRegCharts();
+});
+</script>
+</body>
+</html>
