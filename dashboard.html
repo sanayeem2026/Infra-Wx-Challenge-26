@@ -82,7 +82,7 @@ tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
     <div class="ibm-logo">IBM</div>
     <div class="header-text">
       <h1>IBMer WatsonX Challenge Dashboard &mdash; Infrastructure</h1>
-      <div class="subtitle">Infrastructure Division &middot; Jul 2026 &middot; Data as of Jul 22</div>
+      <div class="subtitle">Infrastructure Division &middot; WatsonX Challenge 2026 &middot; Data: 27 Aug 2026 (Tagged)</div>
     </div>
   </div>
 </header>
@@ -91,46 +91,65 @@ tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
     <div class="info-pill">Org: <span>Infrastructure</span></div>
     <div class="info-pill">Exec Leader: <span>Ric Lewis</span></div>
     <div class="info-pill">Org Leaders: <span>Jamie Thomas &bull; Barry Baker &bull; Alan Peacock &bull; Koos Lodewijkx</span></div>
-    <div class="info-pill">Global Managers: <span>Multiple Teams</span></div>
   </div>
 </div>
 <div class="toggle-bar">
-  <button class="toggle-btn active" onclick="switchView('reg')">&#128203; Registrations</button>
-  <button class="toggle-btn" onclick="switchView('sub')">&#128640; Project Submissions</button>
+  <button class="toggle-btn active" onclick="switchView('reg')">&#128203; Submissions Overview</button>
+  <button class="toggle-btn" onclick="switchView('sub')">&#128640; Browse All Submissions</button>
 </div>
 <main class="main">
+
+  <!-- VIEW: Overview -->
   <div id="view-reg">
     <div class="kpi-row">
-      <div class="kpi-card blue"><div class="kpi-label">Registered for Challenge</div><div class="kpi-value">13,345</div></div>
-      <div class="kpi-card green"><div class="kpi-label">Joined a Team</div><div class="kpi-value">10,637</div></div>
-      <div class="kpi-card purple"><div class="kpi-label">Team Leaders / Teams Created</div><div class="kpi-value">2,548</div></div>
+      <div class="kpi-card blue"><div class="kpi-label">Total Submissions</div><div class="kpi-value" id="kpiTotal">â</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Orgs Represented</div><div class="kpi-value" id="kpiOrgs">â</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Solution Buckets</div><div class="kpi-value" id="kpiSolBuckets">â</div></div>
     </div>
     <div class="sub-kpi-row">
-      <div class="sub-kpi-card"><div class="sub-kpi-pct">79.7%</div><div class="sub-kpi-desc">of registrants joined a team</div></div>
+      <div class="sub-kpi-card">
+        <div class="sub-kpi-pct" id="kpiTechBuckets">â</div>
+        <div class="sub-kpi-desc">Technical Statement Buckets across all submissions</div>
+      </div>
     </div>
-    <div class="chart-section"><div class="chart-heading">Registered for IBMer WatsonX Challenge</div><div class="chart-sub">By Org L2 | Total: 13,345</div><div class="chart-div" id="chart1"></div></div>
-    <div class="chart-section"><div class="chart-heading">Joined a WatsonX Challenge Team</div><div class="chart-sub">By Org L2 | Total: 10,637</div><div class="chart-div" id="chart2"></div></div>
-    <div class="chart-section"><div class="chart-heading">Team Leaders / Teams Created</div><div class="chart-sub">By Org L2 | Total: 2,548</div><div class="chart-div" id="chart3"></div></div>
+    <div class="chart-section">
+      <div class="chart-heading">Submissions by Org</div>
+      <div class="chart-sub" id="chart1Sub">Loading...</div>
+      <div class="chart-div" id="chart1"></div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-heading">Solution Statement Buckets</div>
+      <div class="chart-sub">Distribution across solution categories</div>
+      <div class="chart-div" id="chart2"></div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-heading">Technical Statement Buckets</div>
+      <div class="chart-sub">Distribution across technical categories</div>
+      <div class="chart-div" id="chart3"></div>
+    </div>
     <div class="table-section">
-      <div class="table-heading">Summary by Org L2</div>
+      <div class="table-heading">Submissions by Org</div>
       <table>
-        <thead><tr><th>Org L2</th><th class="num">Registered</th><th class="num">Joined Team</th><th class="num">Team Leaders</th></tr></thead>
+        <thead><tr><th>Org</th><th class="num">Submissions</th><th class="num">% of Total</th></tr></thead>
         <tbody id="regTableBody"></tbody>
-        <tfoot><tr><td><strong>Total</strong></td><td class="num td-blue">13,345</td><td class="num td-green">10,637 <span class="badge badge-green">79.7%</span></td><td class="num td-purple">2,548</td></tr></tfoot>
+        <tfoot><tr><td><strong>Total</strong></td><td class="num td-blue" id="footTotal">â</td><td class="num">100%</td></tr></tfoot>
       </table>
     </div>
   </div>
+
+  <!-- VIEW: Browse -->
   <div id="view-sub" style="display:none">
-    <div class="kpi-row" id="subKpiRow"></div>
+    <div class="kpi-row">
+      <div class="kpi-card blue"><div class="kpi-label">Showing</div><div class="kpi-value" id="kpiFiltered">â</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Total Submissions</div><div class="kpi-value">996</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Pages</div><div class="kpi-value" id="kpiPages">â</div></div>
+    </div>
     <div class="filter-bar">
       <label class="search-wrap">Search
-        <input class="search-box" type="text" id="searchBox" placeholder="Search team, org, manager..." oninput="applyFilters()">
+        <input class="search-box" type="text" id="searchBox" placeholder="Search team, org, bucket..." oninput="applyFilters()">
       </label>
       <label>Org
         <select id="filterOrg" onchange="applyFilters()"><option value="">All Orgs</option></select>
-      </label>
-      <label>Exec Leader
-        <select id="filterExec" onchange="applyFilters()"><option value="">All Exec Leaders</option></select>
       </label>
       <label>Solution Bucket
         <select id="filterSol" onchange="applyFilters()"><option value="">All Solution Buckets</option></select>
@@ -147,15 +166,13 @@ tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
             <th>Team Name</th>
             <th>Org</th>
             <th>Business Unit</th>
-            <th>Exec Leader</th>
-            <th>Org Leader Direct</th>
-            <th>Global Manager</th>
             <th>Solution Bucket</th>
             <th>Technical Bucket</th>
             <th>Impact Buckets</th>
+            <th>Judging</th>
           </tr>
         </thead>
-        <tbody id="subTableBody"></tbody>
+        <tbody id="subTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:#a8a8a8">Loading submissions...</td></tr></tbody>
       </table>
       <div class="pagination">
         <button class="page-btn" id="prevBtn" onclick="changePage(-1)">&#8592; Prev</button>
@@ -164,196 +181,100 @@ tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
       </div>
     </div>
   </div>
+
 </main>
-<footer class="footer">IBM Infrastructure &middot; WatsonX Challenge 2026</footer>
+<footer class="footer">IBM Infrastructure &middot; WatsonX Challenge 2026 &middot; 996 Submissions</footer>
+<script src="submissions-data.js"></script>
 <script>
-// ââ Registration data ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-const REG_DATA = [
-  { org: 'IBM Z',               registered: 3021, joined: 2487, leaders: 601 },
-  { org: 'Cloud',               registered: 2654, joined: 2134, leaders: 512 },
-  { org: 'Storage',             registered: 1876, joined: 1502, leaders: 358 },
-  { org: 'Power',               registered: 1543, joined: 1211, leaders: 287 },
-  { org: 'CISO',                registered: 1102, joined:  876, leaders: 208 },
-  { org: 'Platform',            registered:  987, joined:  789, leaders: 189 },
-  { org: 'COO',                 registered:  743, joined:  589, leaders: 143 },
-  { org: 'TLS',                 registered:  621, joined:  489, leaders: 118 },
-  { org: 'Enterprise Dev',      registered:  498, joined:  389, leaders:  94 },
-  { org: 'Growth & Innovation', registered:  300, joined:  171, leaders:  38 }
-];
+const SOL_COLORS={'Security, Compliance & Risk Automation':'#da1e28','AI-Powered Developer & Engineering Productivity':'#0f62fe','Data, Reporting & Decision Intelligence':'#8a3ffc','Operations, Automation & Self-Healing Workflows':'#009d9a','Knowledge Management & Documentation AI':'#ff832b','Uncategorised':'#6f6f6f'};
+const TECH_COLORS={'IBM Bob Agentic / Mode-Based':'#0f62fe','ML / AI / RAG Pipelines':'#8a3ffc','Java / Spring Boot Applications':'#da1e28','Python / Flask / CLI Tools':'#ff832b','TypeScript / Node.js':'#42be65','Low-Level / Systems / Infra Tooling':'#009d9a','Uncategorised':'#6f6f6f'};
+let SUB_DATA=[],filteredSubs=[],currentPage=1;const PAGE_SIZE=25;
 
-// ââ Submission data âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-const SUB_DATA = [
-  { team:'Assure AI', org:'CISO', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Barry Baker', gm:'Team Alpha', sol:'Security, Compliance & Risk Automation', tech:'IBM Bob Agentic / Mode-Based', impact:'Efficiency & Time Savings; Risk Reduction & Compliance' },
-  { team:'CloudOps Wizard', org:'Cloud', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Jamie Thomas', gm:'Team Beta', sol:'Operations, Automation & Self-Healing Workflows', tech:'ML / AI / RAG Pipelines', impact:'Efficiency & Time Savings; Accuracy & Consistency' },
-  { team:'Z Sentinel', org:'IBM Z', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Alan Peacock', gm:'Team Gamma', sol:'AI-Powered Developer & Engineering Productivity', tech:'IBM Bob Agentic / Mode-Based', impact:'Speed Up Product Development; Innovation & New Features' },
-  { team:'StoreSmart', org:'Storage', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Koos Lodewijkx', gm:'Team Delta', sol:'Data, Reporting & Decision Intelligence', tech:'Python / Flask / CLI Tools', impact:'Faster Information Access; Accuracy & Consistency' },
-  { team:'PowerAI', org:'Power', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Jamie Thomas', gm:'Team Epsilon', sol:'AI-Powered Developer & Engineering Productivity', tech:'Java / Spring Boot Applications', impact:'Efficiency & Time Savings; Code Quality & Maintenance' },
-  { team:'DocuBot', org:'Platform', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Barry Baker', gm:'Team Zeta', sol:'Knowledge Management & Documentation AI', tech:'TypeScript / Node.js', impact:'Faster Information Access; Simplified Team Processes' },
-  { team:'SecureFlow', org:'CISO', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Barry Baker', gm:'Team Eta', sol:'Security, Compliance & Risk Automation', tech:'Python / Flask / CLI Tools', impact:'Risk Reduction & Compliance; Accuracy & Consistency' },
-  { team:'TLSAutomate', org:'TLS', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Alan Peacock', gm:'Team Theta', sol:'Operations, Automation & Self-Healing Workflows', tech:'Low-Level / Systems / Infra Tooling', impact:'Efficiency & Time Savings; Simplified Team Processes' },
-  { team:'EnterpriseMind', org:'Enterprise Dev', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Koos Lodewijkx', gm:'Team Iota', sol:'AI-Powered Developer & Engineering Productivity', tech:'ML / AI / RAG Pipelines', impact:'Speed Up Product Development; Innovation & New Features' },
-  { team:'GrowthHack AI', org:'Growth & Innovation', bu:'Infrastructure', exec:'Ric Lewis', orgLeader:'Jamie Thomas', gm:'Team Kappa', sol:'Data, Reporting & Decision Intelligence', tech:'IBM Bob Agentic / Mode-Based', impact:'Faster Information Access; Efficiency & Time Savings' }
-];
-
-// ââ Badge colours âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-const SOL_COLORS = {
-  'Security, Compliance & Risk Automation':          '#da1e28',
-  'AI-Powered Developer & Engineering Productivity': '#0f62fe',
-  'Data, Reporting & Decision Intelligence':         '#8a3ffc',
-  'Operations, Automation & Self-Healing Workflows': '#009d9a',
-  'Knowledge Management & Documentation AI':         '#ff832b',
-  'Uncategorised':                                   '#6f6f6f'
-};
-const TECH_COLORS = {
-  'IBM Bob Agentic / Mode-Based':      '#0f62fe',
-  'ML / AI / RAG Pipelines':           '#8a3ffc',
-  'Java / Spring Boot Applications':   '#da1e28',
-  'Python / Flask / CLI Tools':        '#ff832b',
-  'TypeScript / Node.js':              '#42be65',
-  'Low-Level / Systems / Infra Tooling':'#009d9a',
-  'Uncategorised':                     '#6f6f6f'
-};
-
-// ââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-let filteredSubs = [...SUB_DATA];
-let currentPage  = 1;
-const PAGE_SIZE  = 25;
-
-// ââ View Toggle âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-function switchView(view) {
-  document.getElementById('view-reg').style.display = view === 'reg' ? '' : 'none';
-  document.getElementById('view-sub').style.display = view === 'sub' ? '' : 'none';
-  document.querySelectorAll('.toggle-btn').forEach((b, i) => {
-    b.classList.toggle('active', (view === 'reg' && i === 0) || (view === 'sub' && i === 1));
-  });
-  if (view === 'sub') renderSubView();
+function switchView(v){
+  document.getElementById('view-reg').style.display=v==='reg'?'':'none';
+  document.getElementById('view-sub').style.display=v==='sub'?'':'none';
+  document.querySelectorAll('.toggle-btn').forEach((b,i)=>b.classList.toggle('active',(v==='reg'&&i===0)||(v==='sub'&&i===1)));
+  if(v==='sub')renderSubView();
 }
 
-// ââ Registration Charts âââââââââââââââââââââââââââââââââââââââââââââââââââââ
-function initRegCharts() {
-  const orgs  = REG_DATA.map(r => r.org);
-  const makeChart = (id, key, color, label) => {
-    const c = echarts.init(document.getElementById(id));
-    c.setOption({
-      backgroundColor: 'transparent',
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      grid: { left: 160, right: 60, top: 20, bottom: 40 },
-      xAxis: { type: 'value', axisLabel: { color: '#a8a8a8' }, splitLine: { lineStyle: { color: '#353535' } } },
-      yAxis: { type: 'category', data: orgs.slice().reverse(), axisLabel: { color: '#c6c6c6', fontSize: 13 }, axisLine: { lineStyle: { color: '#525252' } } },
-      series: [{ type: 'bar', data: REG_DATA.map(r => r[key]).reverse(), itemStyle: { color }, barMaxWidth: 36,
-        label: { show: true, position: 'right', color: '#f4f4f4', fontSize: 12, formatter: v => v.data.toLocaleString() } }]
-    });
-    window.addEventListener('resize', () => c.resize());
-  };
-  makeChart('chart1', 'registered', '#4589ff', 'Registered');
-  makeChart('chart2', 'joined',     '#42be65', 'Joined Team');
-  makeChart('chart3', 'leaders',    '#a56eff', 'Team Leaders');
+function initDashboard(){
+  const total=SUB_DATA.length;
+  const orgs=new Set(SUB_DATA.map(r=>r.o));
+  const sols=new Set(SUB_DATA.map(r=>r.s));
+  const techs=new Set(SUB_DATA.map(r=>r.x));
+  document.getElementById('kpiTotal').textContent=total.toLocaleString();
+  document.getElementById('kpiOrgs').textContent=orgs.size;
+  document.getElementById('kpiSolBuckets').textContent=sols.size;
+  document.getElementById('kpiTechBuckets').textContent=techs.size;
+  document.getElementById('footTotal').textContent=total.toLocaleString();
+  document.getElementById('chart1Sub').textContent='By Org | Total: '+total.toLocaleString()+' submissions';
 
-  // Registration table
-  const tbody = document.getElementById('regTableBody');
-  tbody.innerHTML = REG_DATA.map(r => `
-    <tr>
-      <td>${r.org}</td>
-      <td class="num td-blue">${r.registered.toLocaleString()}</td>
-      <td class="num td-green">${r.joined.toLocaleString()} <span class="badge badge-green">${Math.round(r.joined/r.registered*100)}%</span></td>
-      <td class="num td-purple">${r.leaders.toLocaleString()}</td>
-    </tr>`).join('');
+  const orgC={};SUB_DATA.forEach(r=>{orgC[r.o]=(orgC[r.o]||0)+1;});
+  const orgE=Object.entries(orgC).sort((a,b)=>b[1]-a[1]);
+  const c1=echarts.init(document.getElementById('chart1'));
+  c1.setOption({backgroundColor:'transparent',tooltip:{trigger:'axis'},grid:{left:200,right:80,top:20,bottom:40},xAxis:{type:'value',axisLabel:{color:'#a8a8a8'},splitLine:{lineStyle:{color:'#353535'}}},yAxis:{type:'category',data:orgE.map(e=>e[0]).reverse(),axisLabel:{color:'#c6c6c6',fontSize:12},axisLine:{lineStyle:{color:'#525252'}}},series:[{type:'bar',data:orgE.map(e=>e[1]).reverse(),itemStyle:{color:'#4589ff'},barMaxWidth:32,label:{show:true,position:'right',color:'#f4f4f4',fontSize:12,formatter:p=>p.data.toLocaleString()}}]});
+
+  const solC={};SUB_DATA.forEach(r=>{solC[r.s]=(solC[r.s]||0)+1;});
+  const sE=Object.entries(solC).sort((a,b)=>b[1]-a[1]);
+  const c2=echarts.init(document.getElementById('chart2'));
+  c2.setOption({backgroundColor:'transparent',tooltip:{trigger:'axis'},grid:{left:320,right:80,top:20,bottom:40},xAxis:{type:'value',axisLabel:{color:'#a8a8a8'},splitLine:{lineStyle:{color:'#353535'}}},yAxis:{type:'category',data:sE.map(e=>e[0]).reverse(),axisLabel:{color:'#c6c6c6',fontSize:12},axisLine:{lineStyle:{color:'#525252'}}},series:[{type:'bar',data:sE.map(e=>({value:e[1],itemStyle:{color:SOL_COLORS[e[0]]||'#4589ff'}})).reverse(),barMaxWidth:32,label:{show:true,position:'right',color:'#f4f4f4',fontSize:12,formatter:p=>p.data.toLocaleString()}}]});
+
+  const techC={};SUB_DATA.forEach(r=>{techC[r.x]=(techC[r.x]||0)+1;});
+  const tE=Object.entries(techC).sort((a,b)=>b[1]-a[1]);
+  const c3=echarts.init(document.getElementById('chart3'));
+  c3.setOption({backgroundColor:'transparent',tooltip:{trigger:'axis'},grid:{left:260,right:80,top:20,bottom:40},xAxis:{type:'value',axisLabel:{color:'#a8a8a8'},splitLine:{lineStyle:{color:'#353535'}}},yAxis:{type:'category',data:tE.map(e=>e[0]).reverse(),axisLabel:{color:'#c6c6c6',fontSize:12},axisLine:{lineStyle:{color:'#525252'}}},series:[{type:'bar',data:tE.map(e=>({value:e[1],itemStyle:{color:TECH_COLORS[e[0]]||'#a56eff'}})).reverse(),barMaxWidth:32,label:{show:true,position:'right',color:'#f4f4f4',fontSize:12,formatter:p=>p.data.toLocaleString()}}]});
+
+  window.addEventListener('resize',()=>{c1.resize();c2.resize();c3.resize();});
+  document.getElementById('regTableBody').innerHTML=orgE.map(([org,cnt])=>`<tr><td>${org}</td><td class="num td-blue">${cnt.toLocaleString()}</td><td class="num td-green">${(cnt/total*100).toFixed(1)}%</td></tr>`).join('');
 }
 
-// ââ Submissions View ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-function renderSubView() {
-  // KPIs
-  const solSet  = new Set(SUB_DATA.map(r => r.sol));
-  const techSet = new Set(SUB_DATA.map(r => r.tech));
-  document.getElementById('subKpiRow').innerHTML = `
-    <div class="kpi-card blue"><div class="kpi-label">Total Submissions</div><div class="kpi-value">${SUB_DATA.length}</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Solution Buckets</div><div class="kpi-value">${solSet.size}</div></div>
-    <div class="kpi-card purple"><div class="kpi-label">Technical Buckets</div><div class="kpi-value">${techSet.size}</div></div>`;
-
-  // Populate filter dropdowns
-  populateSelect('filterOrg',  [...new Set(SUB_DATA.map(r => r.org))].sort());
-  populateSelect('filterExec', [...new Set(SUB_DATA.map(r => r.exec))].sort());
-  populateSelect('filterSol',  [...new Set(SUB_DATA.map(r => r.sol))].sort());
-  populateSelect('filterTech', [...new Set(SUB_DATA.map(r => r.tech))].sort());
-
+function renderSubView(){
+  populateSelect('filterOrg',[...new Set(SUB_DATA.map(r=>r.o))].sort());
+  populateSelect('filterSol',[...new Set(SUB_DATA.map(r=>r.s))].sort());
+  populateSelect('filterTech',[...new Set(SUB_DATA.map(r=>r.x))].sort());
   applyFilters();
 }
-
-function populateSelect(id, values) {
-  const sel = document.getElementById(id);
-  const cur = sel.value;
-  // keep first "All" option, rebuild rest
-  while (sel.options.length > 1) sel.remove(1);
-  values.forEach(v => { const o = document.createElement('option'); o.value = o.textContent = v; sel.appendChild(o); });
-  sel.value = cur;
-}
-
-function applyFilters() {
-  const q    = (document.getElementById('searchBox').value || '').toLowerCase();
-  const org  = document.getElementById('filterOrg').value;
-  const exec = document.getElementById('filterExec').value;
-  const sol  = document.getElementById('filterSol').value;
-  const tech = document.getElementById('filterTech').value;
-
-  filteredSubs = SUB_DATA.filter(r => {
-    if (org  && r.org  !== org)  return false;
-    if (exec && r.exec !== exec) return false;
-    if (sol  && r.sol  !== sol)  return false;
-    if (tech && r.tech !== tech) return false;
-    if (q) {
-      const hay = [r.team, r.org, r.gm, r.sol, r.tech, r.impact].join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
+function populateSelect(id,vals){const sel=document.getElementById(id);if(!sel)return;while(sel.options.length>1)sel.remove(1);vals.forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;sel.appendChild(o);});}
+function applyFilters(){
+  const q=(document.getElementById('searchBox').value||'').toLowerCase(),org=document.getElementById('filterOrg').value,sol=document.getElementById('filterSol').value,tech=document.getElementById('filterTech').value;
+  filteredSubs=SUB_DATA.filter(r=>{
+    if(org&&r.o!==org)return false;
+    if(sol&&r.s!==sol)return false;
+    if(tech&&r.x!==tech)return false;
+    if(q){const h=[r.t,r.o,r.s,r.x,r.i,r.e].join(' ').toLowerCase();if(!h.includes(q))return false;}
     return true;
   });
-  currentPage = 1;
-  renderTable();
+  currentPage=1;renderTable();
 }
-
-function renderTable() {
-  const total = filteredSubs.length;
-  const pages = Math.ceil(total / PAGE_SIZE) || 1;
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const page  = filteredSubs.slice(start, start + PAGE_SIZE);
-
-  document.getElementById('subCount').textContent = `(${total.toLocaleString()} results)`;
-  document.getElementById('pageInfo').textContent  = `Page ${currentPage} of ${pages}`;
-  document.getElementById('prevBtn').disabled      = currentPage === 1;
-  document.getElementById('nextBtn').disabled      = currentPage === pages;
-
-  const tbody = document.getElementById('subTableBody');
-  tbody.innerHTML = page.map(r => {
-    const sc = SOL_COLORS[r.sol]  || '#6f6f6f';
-    const tc = TECH_COLORS[r.tech] || '#6f6f6f';
-    const impacts = (r.impact || '').split(';').map(s => s.trim()).filter(Boolean)
-      .map(s => `<span class="sb-badge" style="background:rgba(61,219,217,.15);color:#3ddbd9">${esc(s)}</span>`).join(' ');
-    return `<tr>
-      <td><strong>${esc(r.team)}</strong></td>
-      <td>${esc(r.org)}</td>
-      <td>${esc(r.bu)}</td>
-      <td>${esc(r.exec)}</td>
-      <td>${esc(r.orgLeader)}</td>
-      <td>${esc(r.gm)}</td>
-      <td><span class="sb-badge" style="background:${sc}22;color:${sc}">${esc(r.sol)}</span></td>
-      <td><span class="sb-badge" style="background:${tc}22;color:${tc}">${esc(r.tech)}</span></td>
-      <td>${impacts}</td>
-    </tr>`;
+function renderTable(){
+  const total=filteredSubs.length,pages=Math.ceil(total/PAGE_SIZE)||1,start=(currentPage-1)*PAGE_SIZE,page=filteredSubs.slice(start,start+PAGE_SIZE);
+  document.getElementById('subCount').textContent=`(${total.toLocaleString()} results)`;
+  document.getElementById('pageInfo').textContent=`Page ${currentPage} of ${pages}`;
+  document.getElementById('prevBtn').disabled=currentPage===1;
+  document.getElementById('nextBtn').disabled=currentPage===pages;
+  document.getElementById('kpiFiltered').textContent=total.toLocaleString();
+  document.getElementById('kpiPages').textContent=pages;
+  const tbody=document.getElementById('subTableBody');
+  if(!total){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:#a8a8a8">No results found</td></tr>';return;}
+  tbody.innerHTML=page.map(r=>{
+    const sc=SOL_COLORS[r.s]||'#6f6f6f',tc=TECH_COLORS[r.x]||'#6f6f6f';
+    const impacts=(r.i||'').split(';').map(s=>s.trim()).filter(Boolean).map(s=>`<span class="sb-badge" style="background:rgba(61,219,217,.15);color:#3ddbd9">${esc(s)}</span>`).join(' ');
+    const jTag=r.j==='Yes'?`<span class="sb-badge" style="background:rgba(66,190,101,.15);color:#42be65">&#10003; Judging</span>`:'';
+    return`<tr><td><strong>${esc(r.t)}</strong><br><span style="font-size:11px;color:#6f6f6f">${esc(r.e||'')}</span></td><td>${esc(r.o)}</td><td>${esc(r.b)}</td><td><span class="sb-badge" style="background:${sc}22;color:${sc}">${esc(r.s)}</span></td><td><span class="sb-badge" style="background:${tc}22;color:${tc}">${esc(r.x)}</span></td><td>${impacts}</td><td>${jTag}</td></tr>`;
   }).join('');
 }
+function changePage(dir){const pages=Math.ceil(filteredSubs.length/PAGE_SIZE)||1;currentPage=Math.max(1,Math.min(pages,currentPage+dir));renderTable();}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-function changePage(dir) {
-  const pages = Math.ceil(filteredSubs.length / PAGE_SIZE) || 1;
-  currentPage = Math.max(1, Math.min(pages, currentPage + dir));
-  renderTable();
-}
-
-function esc(s) {
-  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ââ Boot ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-window.addEventListener('DOMContentLoaded', () => {
-  initRegCharts();
+window.addEventListener('DOMContentLoaded',()=>{
+  if(window.SUBMISSIONS_DATA && window.SUBMISSIONS_DATA.length){
+    SUB_DATA=window.SUBMISSIONS_DATA;
+    filteredSubs=[...SUB_DATA];
+    initDashboard();
+  } else {
+    document.getElementById('kpiTotal').textContent='ERR';
+    console.error('SUBMISSIONS_DATA not loaded');
+  }
 });
 </script>
 </body>
