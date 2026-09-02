@@ -152,7 +152,7 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid #e5e7eb;text-align:
         </div>
         <div class="fg"><label>Org</label><select id="filterOrg" onchange="applyFilters()"><option value="">All Orgs</option></select></div>
         <div class="fg"><label>Solution Bucket</label><select id="filterSol" onchange="applyFilters()"><option value="">All Buckets</option></select></div>
-        <div class="fg"><label>Technical Bucket</label><select id="filterTech" onchange="applyFilters()"><option value="">All Buckets</option></select></div><div class="fg"><label>Impact Bucket</label><select id="filterImpact" onchange="applyFilters()"><option value="">All Impacts</option></select></div><div class="fg"><label>Impact Bucket</label><select id="filterImpact" onchange="applyFilters()"><option value="">All Impacts</option></select></div>
+        <div class="fg"><label>Technical Bucket</label><select id="filterTech" onchange="applyFilters()"><option value="">All Buckets</option></select></div>
       </div>
     </div>
     <div class="section">
@@ -228,18 +228,16 @@ function initDashboard(){
 function renderSubView(){
   populateSelect('filterOrg',[...new Set(SUB_DATA.map(r=>r.o))].sort());
   populateSelect('filterSol',[...new Set(SUB_DATA.map(r=>r.s))].sort());
-  populateSelect('filterTech',[...new Set(SUB_DATA.map(r=>r.x))].sort()); const impactSet=new Set();SUB_DATA.forEach(r=>{(r.i||"").split(";").map(s=>s.trim()).filter(Boolean).forEach(s=>impactSet.add(s));});populateSelect("filterImpact",[...impactSet].sort());
-  const impactSet=new Set();SUB_DATA.forEach(r=>{(r.i||'').split(';').map(s=>s.trim()).filter(Boolean).forEach(s=>impactSet.add(s));});populateSelect('filterImpact',[...impactSet].sort());
+  populateSelect('filterTech',[...new Set(SUB_DATA.map(r=>r.x))].sort());
   applyFilters();
 }
 function populateSelect(id,vals){const sel=document.getElementById(id);if(!sel)return;while(sel.options.length>1)sel.remove(1);vals.forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;sel.appendChild(o);});}
 function applyFilters(){
-  const q=(document.getElementById('searchBox').value||'').toLowerCase(),org=document.getElementById('filterOrg').value,sol=document.getElementById('filterSol').value,tech=document.getElementById('filterTech').value,impact=document.getElementById('filterImpact').value;
+  const q=(document.getElementById('searchBox').value||'').toLowerCase(),org=document.getElementById('filterOrg').value,sol=document.getElementById('filterSol').value,tech=document.getElementById('filterTech').value;
   filteredSubs=SUB_DATA.filter(r=>{
     if(org&&r.o!==org)return false;
     if(sol&&r.s!==sol)return false;
     if(tech&&r.x!==tech)return false;
-    if(impact&&!(r.i||'').split(';').map(s=>s.trim()).includes(impact))return false;
     if(q){const h=[r.t,r.o,r.s,r.x,r.i,r.e].join(' ').toLowerCase();if(!h.includes(q))return false;}
     return true;
   });
