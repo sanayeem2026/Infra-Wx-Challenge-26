@@ -152,7 +152,7 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid #e5e7eb;text-align:
         </div>
         <div class="fg"><label>Org</label><select id="filterOrg" onchange="applyFilters()"><option value="">All Orgs</option></select></div>
         <div class="fg"><label>Solution Bucket</label><select id="filterSol" onchange="applyFilters()"><option value="">All Buckets</option></select></div>
-        <div class="fg"><label>Technical Bucket</label><select id="filterTech" onchange="applyFilters()"><option value="">All Buckets</option></select></div><div class="fg"><label>Impact Bucket</label><select id="filterImpact" onchange="applyFilters()"><option value="">All Impacts</option></select></div>
+        <div class="fg"><label>Technical Bucket</label><select id="filterTech" onchange="applyFilters()"><option value="">All Buckets</option></select></div><div class="fg"><label>Impact Bucket</label><select id="filterImpact" onchange="applyFilters()"><option value="">All Impacts</option></select></div><div class="fg"><label>Impact Bucket</label><select id="filterImpact" onchange="applyFilters()"><option value="">All Impacts</option></select></div>
       </div>
     </div>
     <div class="section">
@@ -228,7 +228,7 @@ function initDashboard(){
 function renderSubView(){
   populateSelect('filterOrg',[...new Set(SUB_DATA.map(r=>r.o))].sort());
   populateSelect('filterSol',[...new Set(SUB_DATA.map(r=>r.s))].sort());
-  populateSelect('filterTech',[...new Set(SUB_DATA.map(r=>r.x))].sort());
+  populateSelect('filterTech',[...new Set(SUB_DATA.map(r=>r.x))].sort()); const impactSet=new Set();SUB_DATA.forEach(r=>{(r.i||"").split(";").map(s=>s.trim()).filter(Boolean).forEach(s=>impactSet.add(s));});populateSelect("filterImpact",[...impactSet].sort());
   const impactSet=new Set();SUB_DATA.forEach(r=>{(r.i||'').split(';').map(s=>s.trim()).filter(Boolean).forEach(s=>impactSet.add(s));});populateSelect('filterImpact',[...impactSet].sort());
   applyFilters();
 }
